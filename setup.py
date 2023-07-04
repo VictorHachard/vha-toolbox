@@ -8,7 +8,7 @@ setuptools.setup(
     version='0.0.1',
     author='Victor Hachard',
     author_email='31635811+VictorHachard@users.noreply.github.com',
-    description='Testing installation of Package',
+    description='My personal Python vha-toolbox',
     # long_description=long_description,
     long_description_content_type="text/markdown",
     url='https://github.com/VictorHachard/my-python-package',
@@ -16,5 +16,5 @@ setuptools.setup(
         "Bug Tracker": "https://github.com/VictorHachard/my-python-package/issues"
     },
     license='MIT',
-    packages=['toolbox'],
+    packages=['vha-toolbox'],
 )
