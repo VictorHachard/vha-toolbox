@@ -4,7 +4,7 @@ import setuptools
 #     long_description = fh.read()
 
 setuptools.setup(
-    name='toolbox',
+    name='vha-toolbox',
     version='0.0.1',
     author='Victor Hachard',
     author_email='31635811+VictorHachard@users.noreply.github.com',
@@ -16,5 +16,5 @@ setuptools.setup(
         "Bug Tracker": "https://github.com/VictorHachard/my-python-package/issues"
     },
     license='MIT',
-    packages=['toolbox'],
+    packages=['vha-toolbox'],
 )
