@@ -16,5 +16,5 @@ setuptools.setup(
         "Bug Tracker": "https://github.com/VictorHachard/my-python-package/issues"
     },
     license='MIT',
-    packages=['vha-toolbox'],
+    packages=['toolbox'],
 )
