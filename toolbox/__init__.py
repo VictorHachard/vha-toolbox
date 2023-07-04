@@ -1,1 +1,1 @@
-from functions import replace_words
+from .highlight_words_in_text import highlight_words_in_text
