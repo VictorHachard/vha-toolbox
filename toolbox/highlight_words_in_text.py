@@ -1,7 +1,14 @@
 import re
+from typing import List
 
 
-def highlight_words_in_text(text, words, replace_start='<span>', replace_end='</span>', case_insensitive=False):
+def highlight_words_in_text(
+        text: str,
+        words: List[str],
+        replace_start: str='<span>',
+        replace_end: str='</span>',
+        case_insensitive: bool=False
+) -> str:
     """
     Highlights specified words in a given text by wrapping them with start_tag and end_tag.
 
