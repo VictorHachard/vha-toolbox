@@ -26,5 +26,7 @@ def replace_multiple_substrings(
         print(replace_multiple_substrings(original_string, replacements))
         # Output: "I have an orange, a grape, and a melon."
     """
+    if not replacements:
+        return string
     pattern = re.compile("|".join([re.escape(k) for k in sorted(replacements, key=len, reverse=True)]), flags=re.DOTALL)
     return pattern.sub(lambda x: replacements[x.group(0)], string)
