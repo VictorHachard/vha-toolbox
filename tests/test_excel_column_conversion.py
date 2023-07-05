@@ -1,6 +1,6 @@
 import unittest
 
-from toolbox import get_position, get_letter
+from vha_toolbox import get_position, get_letter
 
 
 class ExcelColumnConversionTestCase(unittest.TestCase):

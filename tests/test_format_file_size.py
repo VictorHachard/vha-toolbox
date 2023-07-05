@@ -1,6 +1,6 @@
 import unittest
 
-from toolbox import format_file_size
+from vha_toolbox import format_file_size
 
 
 class FormatFileSizeTestCase(unittest.TestCase):

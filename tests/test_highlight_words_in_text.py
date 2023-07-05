@@ -1,6 +1,6 @@
 import unittest
 
-from toolbox import highlight_words_in_text
+from vha_toolbox import highlight_words_in_text
 
 
 class HighlighterTestCase(unittest.TestCase):

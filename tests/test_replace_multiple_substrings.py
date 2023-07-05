@@ -1,6 +1,6 @@
 import unittest
 
-from toolbox import replace_multiple_substrings
+from vha_toolbox import replace_multiple_substrings
 
 
 class ReplaceMultipleSubstringsTestCase(unittest.TestCase):
