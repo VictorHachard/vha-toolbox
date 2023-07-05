@@ -5,7 +5,6 @@ from vha_toolbox import format_file_size
 
 class FormatFileSizeTestCase(unittest.TestCase):
     def test_format_file_size(self):
-        # Valid cases
         self.assertEqual(format_file_size(0), "0.0 B")
         self.assertEqual(format_file_size(1023), "1023.0 B")
         self.assertEqual(format_file_size(1024), "1.0 KB")
