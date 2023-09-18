@@ -1,5 +1,3 @@
-import unittest
-
 
 def get_position(s: str) -> int:
     """
