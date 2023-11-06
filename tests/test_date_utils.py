@@ -52,6 +52,11 @@ class DateUtilsTestCase(unittest.TestCase):
         result = get_last_day_of_month(dt)
         self.assertEqual(result, date(2024, 2, 29))
 
+    def test_get_last_day_of_month_3(self):
+        dt = date(2021, 2, 10)
+        result = get_last_day_of_month(dt)
+        self.assertEqual(result, date(2021, 2, 28))
+
 
 if __name__ == '__main__':
     unittest.main()
