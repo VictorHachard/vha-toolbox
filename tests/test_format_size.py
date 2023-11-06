@@ -1,6 +1,6 @@
 import unittest
 
-from vha_toolbox import format_readable_size, to_bytes
+from vha_toolbox import format_readable_size, to_bytes, sort_human_readable_sizes
 
 
 class FormatSizeTestCase(unittest.TestCase):
@@ -35,11 +35,34 @@ class FormatSizeTestCase(unittest.TestCase):
         self.assertEqual(to_bytes("888.1784 PB"), 999999977819630848)
 
     def test_to_bytes_error(self):
+        self.assertRaises(ValueError, to_bytes, "")
         self.assertRaises(ValueError, to_bytes, "0")
         self.assertRaises(ValueError, to_bytes, "1")
         self.assertRaises(ValueError, to_bytes, "1.0 B B")
         self.assertRaises(ValueError, to_bytes, "-1")
         self.assertRaises(ValueError, to_bytes, "-1.0 B")
+
+    def test_sort_human_readable_sizes(self):
+        sizes = ["1 KB", "117.7 MB", "1023 B", "931.3 GB", "888.2 PB"]
+        expected = ["1023 B", "1 KB", "117.7 MB", "931.3 GB", "888.2 PB"]
+        self.assertEqual(sort_human_readable_sizes(sizes), expected)
+
+        sizes = ["1 KB", "117.7 MB", "1023 B", "931.3 GB", "888.2 PB", "0 B"]
+        expected = ["0 B", "1023 B", "1 KB", "117.7 MB", "931.3 GB", "888.2 PB"]
+        self.assertEqual(sort_human_readable_sizes(sizes), expected)
+
+        sizes = ["1 KB", "117.7 MB", "1023 B", "931.3 GB", "888.2 PB", "0 B", "1 KB"]
+        expected = ["0 B", "1023 B", "1 KB", "1 KB", "117.7 MB", "931.3 GB", "888.2 PB"]
+        self.assertEqual(sort_human_readable_sizes(sizes), expected)
+
+        sizes = ["1.1 KB", "117.7 MB", "1023 B", "931.3 GB", "888.2 PB", "0 B", "1 KB", "1 KB"]
+        expected = ["0 B", "1023 B", "1 KB", "1 KB", "1.1 KB", "117.7 MB", "931.3 GB", "888.2 PB"]
+        self.assertEqual(sort_human_readable_sizes(sizes), expected)
+
+    def test_sort_human_readable_sizes_error(self):
+        self.assertRaises(ValueError, sort_human_readable_sizes, ["1 KB", "117.7 Hello"])
+        self.assertRaises(ValueError, sort_human_readable_sizes, ["1 KB", "117.7 MB", ""])
+        self.assertRaises(ValueError, sort_human_readable_sizes, ["-1 KB"])
 
 
 if __name__ == '__main__':
