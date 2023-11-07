@@ -55,5 +55,6 @@ class ReplaceMultipleSubstringsTestCase(unittest.TestCase):
         result = replace_multiple_substrings(original_string, replacements)
         self.assertEqual(result, expected_result)
 
+
 if __name__ == '__main__':
     unittest.main()

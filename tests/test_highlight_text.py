@@ -19,6 +19,22 @@ class HighlightTextTestCase(unittest.TestCase):
         result = highlight_text(text, words, start_tag='[', end_tag=']')
         self.assertEqual(result, expected_output)
 
+    def test_highlight_text_custom_tags_contained_in_text(self):
+        text = "This is a sample text to test the highlighting [function]."
+        words = ["sample", "function"]
+        expected_output = "This is a [sample] text to test the highlighting [[function]]."
+
+        result = highlight_text(text, words, start_tag='[', end_tag=']')
+        self.assertEqual(result, expected_output)
+
+    def test_highlight_text_custom_tags_contained_in_text_2(self):
+        text = "This is a sample text to test the highlighting [function]."
+        words = ["sample", "function"]
+        expected_output = "This is a [[sample]] text to test the highlighting [[[function]]]."
+
+        result = highlight_text(text, words, start_tag='[[', end_tag=']]')
+        self.assertEqual(result, expected_output)
+
     def test_highlight_text_case_insensitive(self):
         text = "This is a case-insensitive Test."
         words = ["TEST"]

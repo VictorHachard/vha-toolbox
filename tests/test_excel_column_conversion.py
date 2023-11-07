@@ -37,5 +37,6 @@ class ExcelColumnConversionTestCase(unittest.TestCase):
         self.assertRaises(ValueError, get_letter, 1.5)
         self.assertRaises(ValueError, get_letter, 'A')
 
+
 if __name__ == '__main__':
     unittest.main()
