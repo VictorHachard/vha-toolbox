@@ -87,12 +87,13 @@ def to_bytes(size_str: str) -> int:
     return int(size)
 
 
-def sort_human_readable_sizes(sizes_list: list) -> list:
+def sort_human_readable_sizes(sizes_list: list, reverse=False) -> list:
     """
     Sort a list of human-readable file sizes in ascending order.
 
     Args:
         sizes_list (list): A list of human-readable file sizes.
+        reverse (bool, optional): If True, sort in descending order. Defaults to False.
 
     Returns:
         list: The sorted list of human-readable file sizes.
@@ -102,7 +103,7 @@ def sort_human_readable_sizes(sizes_list: list) -> list:
         ['128 KB', '512 KB', '1.5 MB', '2 GB']
     """
     size_byte_tuples = [(to_bytes(size), size) for size in sizes_list]
-    sorted_size_byte_tuples = sorted(size_byte_tuples, key=lambda x: x[0])
+    sorted_size_byte_tuples = sorted(size_byte_tuples, key=lambda x: x[0], reverse=reverse)
     sorted_sizes = [size for (_, size) in sorted_size_byte_tuples]
 
     return sorted_sizes

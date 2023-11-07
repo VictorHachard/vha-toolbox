@@ -59,6 +59,23 @@ class FormatSizeTestCase(unittest.TestCase):
         expected = ["0 B", "1023 B", "1 KB", "1 KB", "1.1 KB", "117.7 MB", "931.3 GB", "888.2 PB"]
         self.assertEqual(sort_human_readable_sizes(sizes), expected)
 
+    def test_sort_human_readable_sizes_reverse(self):
+        sizes = ["1 KB", "117.7 MB", "1023 B", "931.3 GB", "888.2 PB"]
+        expected = ["888.2 PB", "931.3 GB", "117.7 MB", "1 KB", "1023 B"]
+        self.assertEqual(sort_human_readable_sizes(sizes, reverse=True), expected)
+
+        sizes = ["1 KB", "117.7 MB", "1023 B", "931.3 GB", "888.2 PB", "0 B"]
+        expected = ["888.2 PB", "931.3 GB", "117.7 MB", "1 KB", "1023 B", "0 B"]
+        self.assertEqual(sort_human_readable_sizes(sizes, reverse=True), expected)
+
+        sizes = ["1 KB", "117.7 MB", "1023 B", "931.3 GB", "888.2 PB", "0 B", "1 KB"]
+        expected = ["888.2 PB", "931.3 GB", "117.7 MB", "1 KB", "1 KB", "1023 B", "0 B"]
+        self.assertEqual(sort_human_readable_sizes(sizes, reverse=True), expected)
+
+        sizes = ["1.1 KB", "117.7 MB", "1023 B", "931.3 GB", "888.2 PB", "0 B", "1 KB", "1 KB"]
+        expected = ["888.2 PB", "931.3 GB", "117.7 MB", "1.1 KB", "1 KB", "1 KB", "1023 B", "0 B"]
+        self.assertEqual(sort_human_readable_sizes(sizes, reverse=True), expected)
+
     def test_sort_human_readable_sizes_error(self):
         self.assertRaises(ValueError, sort_human_readable_sizes, ["1 KB", "117.7 Hello"])
         self.assertRaises(ValueError, sort_human_readable_sizes, ["1 KB", "117.7 MB", ""])
