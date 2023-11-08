@@ -15,22 +15,21 @@ def highlight_text(
     """
     Highlights specified words in a given text by wrapping them with start_tag and end_tag.
 
-    :param str text: The input text to be processed.
-    :param list words: A list of words to be highlighted.
-    :param str start_tag: The starting HTML tag to wrap around the highlighted words. Default is '<span>'.
-    :param str end_tag: The ending HTML tag to wrap around the highlighted words. Default is '</span>'.
-    :param bool case_insensitive: If True, performs case-insensitive matching. Default is False.
-    :param bool accents_insensitive: If True, performs accent-insensitive matching. Default is False.
-    :param bool word_boundaries: If True, matches whole words only. Default is True.
+    Args:
+        text (str): The input text to be processed.
+        words (list): A list of words to be highlighted.
+        start_tag (str, optional): The starting HTML tag to wrap around the highlighted words. Defaults to '<span>'.
+        end_tag (str, optional): The ending HTML tag to wrap around the highlighted words. Defaults to '</span>'.
+        case_insensitive (bool, optional): If True, performs case-insensitive matching. Defaults to False.
+        accents_insensitive (bool, optional): If True, performs accent-insensitive matching. Defaults to False.
+        word_boundaries (bool, optional): If True, matches whole words only. Defaults to True.
 
-    :return: The text with the specified words highlighted using the provided HTML tags.
-    :rtype: str
+    Returns:
+        str: The text with the specified words highlighted using the provided tags.
 
     Example:
-    text = "Hello world! This is a sample text."
-    words = ["hello", "sample"]
-    print(highlight_words_in_text(text, words, start_tag='<strong>', end_tag='</strong>', case_insensitive=True))
-    # Output: "<strong>Hello</strong> world! This is a <strong>sample</strong> text."
+        >>> highlight_text('Hello world! This is a sample text.', ['hello', 'sample'])
+        '<span>Hello</span> world! This is a <span>sample</span> text.'
     """
     positions = []
 

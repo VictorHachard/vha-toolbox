@@ -3,7 +3,7 @@ import unittest
 from vha_toolbox import truncate_with_ellipsis
 
 
-class StringManipulationTestCase(unittest.TestCase):
+class TruncateWithEllipsisTestCase(unittest.TestCase):
     def test_truncate_with_ellipsis(self):
         self.assertEqual(truncate_with_ellipsis('Hello world!', 5), 'Hello...')
         self.assertEqual(truncate_with_ellipsis('Hello world!', 7), 'Hello w...')

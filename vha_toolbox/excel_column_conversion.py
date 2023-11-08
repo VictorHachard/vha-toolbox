@@ -4,10 +4,10 @@ def get_position(s: str) -> int:
     Converts an Excel-style column label to a column number.
 
     Args:
-        s: The Excel-style column label.
+        s (str): The Excel-style column label.
 
     Returns:
-        The corresponding column number.
+        int: The corresponding column number.
 
     Examples:
         >>> get_position('A')
@@ -38,10 +38,10 @@ def get_letter(i: int) -> str:
     Converts a 1-relative column number to an Excel-style column label.
 
     Args:
-        i: The 1-relative column number.
+        i (int): The 1-relative column number.
 
     Returns:
-        The corresponding Excel-style column label.
+        str: The corresponding Excel-style column label.
 
     Examples:
         >>> get_letter(1)

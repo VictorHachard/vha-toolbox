@@ -1,5 +1,10 @@
+from typing import Dict
 
-def sort_dict_by_list(input_dict: dict, order_list: list) -> dict:
+
+def sort_dict_by_list(
+        input_dict: Dict[str, any],
+        order_list: list[str]
+) -> Dict[str, any]:
     """
     Sorts a dictionary based on a custom order specified in a list.
 

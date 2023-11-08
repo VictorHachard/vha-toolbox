@@ -19,6 +19,7 @@ class ExcelColumnConversionTestCase(unittest.TestCase):
         self.assertRaises(ValueError, get_position, '')
         self.assertRaises(ValueError, get_position, '1')
         self.assertRaises(ValueError, get_position, 'AA0')
+        self.assertRaises(ValueError, get_position, None)
 
     def test_get_letter(self):
         self.assertEqual(get_letter(1), 'A')
@@ -36,6 +37,8 @@ class ExcelColumnConversionTestCase(unittest.TestCase):
         self.assertRaises(ValueError, get_letter, -1)
         self.assertRaises(ValueError, get_letter, 1.5)
         self.assertRaises(ValueError, get_letter, 'A')
+        self.assertRaises(ValueError, get_letter, '')
+        self.assertRaises(ValueError, get_letter, None)
 
 
 if __name__ == '__main__':

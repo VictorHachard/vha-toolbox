@@ -17,6 +17,8 @@ def format_readable_size(size: int, decimal_places: int = 1) -> str:
         '117.7 MB'
         >>> format_readable_size(123456789, decimal_places=2)
         '117.74 MB'
+        >>> format_readable_size(1000000000000)
+        '931.3 GB'
 
     Raises:
         ValueError: If the size is negative.
@@ -30,7 +32,7 @@ def format_readable_size(size: int, decimal_places: int = 1) -> str:
     suffixes = ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB', 'BB']
     magnitude = int(math.floor(math.log(size, 1024)))
 
-    # Handle extremely large file sizes
+    # Handle extremely large sizes
     if magnitude >= len(suffixes):
         magnitude = len(suffixes) - 1
 
@@ -53,6 +55,8 @@ def to_bytes(size_str: str) -> int:
     Example:
         >>> to_bytes('117.7 MB')
         123417395
+        >>> to_bytes('1.1 KB')
+        1126
 
     Raises:
         ValueError: If the size is negative.
@@ -87,7 +91,7 @@ def to_bytes(size_str: str) -> int:
     return int(size)
 
 
-def sort_human_readable_sizes(sizes_list: list, reverse=False) -> list:
+def sort_human_readable_sizes(sizes_list: list, reverse: bool = False) -> list:
     """
     Sort a list of human-readable file sizes in ascending order.
 
