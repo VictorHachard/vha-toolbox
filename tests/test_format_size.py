@@ -34,6 +34,10 @@ class FormatSizeTestCase(unittest.TestCase):
         self.assertEqual(to_bytes("931.3 GB"), 999975760691)
         self.assertEqual(to_bytes("888.1784 PB"), 999999977819630848)
 
+    def test_to_bytes_wrong_unit(self):
+        self.assertEqual(to_bytes("10230 B"), 10230)
+        self.assertEqual(to_bytes("0.001 MB"), 1048)
+
     def test_to_bytes_error(self):
         self.assertRaises(ValueError, to_bytes, "")
         self.assertRaises(ValueError, to_bytes, "0")

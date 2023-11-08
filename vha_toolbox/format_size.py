@@ -42,7 +42,7 @@ def format_readable_size(size: int, decimal_places: int = 1) -> str:
 
 def to_bytes(size_str: str) -> int:
     """
-    Convert a human-readable file size to bytes. The value is an approximation.
+    Convert a human-readable size to bytes. The value is an approximation.
 
     Args:
         size_str (str): The human-readable file size.
