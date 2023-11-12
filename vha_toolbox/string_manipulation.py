@@ -1,3 +1,4 @@
+import math
 from typing import Dict
 import re
 
@@ -36,14 +37,14 @@ def truncate_with_ellipsis(
 
 
 def replace_multiple_substrings(
-        string: str,
+        input_string: str,
         replacements: Dict[str, str]
 ) -> str:
     """
     Replaces multiple substrings in a string based on a dictionary of replacements.
 
     Args:
-        string (str): The original string to perform replacements on.
+        input_string (str): The original string to perform replacements on.
         replacements (dict): A dictionary where keys are substrings to be replaced and values are their replacements.
 
     Returns:
@@ -60,6 +61,42 @@ def replace_multiple_substrings(
         'I have an orange, a grape, and a melon.'
     """
     if not replacements:
-        return string
+        return input_string
     pattern = re.compile("|".join([re.escape(k) for k in sorted(replacements, key=len, reverse=True)]), flags=re.DOTALL)
-    return pattern.sub(lambda x: replacements[x.group(0)], string)
+    return pattern.sub(lambda x: replacements[x.group(0)], input_string)
+
+
+def anonymize_sentence(
+        input_string: str,
+        # keep_partial_word: bool = False,
+        anonymized_char: str = '*',
+        # erase_ratio: float = 0.5
+) -> str:
+    """
+    Anonymizes a sentence by replacing all words with a specified character.
+
+    Args:
+        input_string (str): The input string to be anonymized.
+        anonymized_char (str, optional): The character to use for anonymization. Defaults to '*'.
+
+    Returns:
+        str: The anonymized string.
+
+    Examples:
+        >>> anonymize_sentence('Hello World')
+        '***** *****'
+        >>> anonymize_sentence('Alice is 28 years old.')
+        '***** ** ** ***** ***.'
+        >>> anonymize_sentence('This is a sample sentence with some 123 numbers and special characters!')
+        '**** ** * ****** ******** **** **** *** ******* *** ******* **********!'
+    """
+    words = re.findall(r'\b\w+\b|\W', input_string)
+    result = []
+
+    for word in words:
+        if word.isalnum():
+            replacement = anonymized_char * len(word)
+            word = replacement
+        result.append(word)
+
+    return ''.join(result)
