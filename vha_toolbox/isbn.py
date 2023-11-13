@@ -26,8 +26,8 @@ class ISBN:
 
     def _sanitize_and_normalize_isbn(self, isbn):
         # Sanitize and normalize the provided ISBN
-        isbn = isbn.replace("-", "").replace(" ", "").lower()
-        normalize = ''.join(char for char in isbn if char.isdigit() or char == 'x')
+        isbn = isbn.replace("-", "").replace(" ", "").upper()
+        normalize = ''.join(char for char in isbn if char.isdigit() or char == 'X')
         if len(normalize) == 10 or len(normalize) == 13:
             return normalize
         else:
@@ -105,7 +105,7 @@ class ISBN:
             bool: True if the ISBN-10 is valid, False otherwise.
         """
         check_sum = sum((i + 1) * int(digit) if digit != 'X' else 10 for i, digit in enumerate(self.isbn[:-1]))
-        return check_sum % 11 == int(self.isbn[-1])
+        return check_sum % 11 == int(self.isbn[-1]) if self.isbn[-1] != 'X' else check_sum % 11 == 10
 
     def is_valid(self) -> bool:
         """

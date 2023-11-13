@@ -14,6 +14,15 @@ class IsbnTestCase(unittest.TestCase):
         self.assertEqual(valid_isbn_13.to_isbn_13(), '978-1-86-197876-9')
         self.assertEqual(valid_isbn_13.to_ean_13(), '9781861978769')
 
+    def test_valid_isbn_13_2(self):
+        valid_isbn_13 = ISBN('9780306406157')
+        self.assertTrue(valid_isbn_13.is_valid())
+        self.assertEqual(valid_isbn_13.break_down_isbn(), [
+            'Prefix: 978', 'Registration group: 0', 'Registrant: 30640', 'Publication: 615', 'Check digit: 7'
+        ])
+        self.assertEqual(valid_isbn_13.format(), '978-0-306-40615-7')
+        self.assertEqual(valid_isbn_13.to_ean(), '9780306406157')
+
     def test_valid_isbn_10(self):
         valid_isbn_10 = ISBN('0-306-40615-2')
         self.assertTrue(valid_isbn_10.is_valid())
@@ -23,6 +32,16 @@ class IsbnTestCase(unittest.TestCase):
         self.assertEqual(valid_isbn_10.format(), '0-306-40615-2')
         self.assertEqual(valid_isbn_10.to_isbn_13(), '978-0-30-640615-7')
         self.assertEqual(valid_isbn_10.to_ean_13(), '9780306406157')
+
+    def test_valid_isbn_10_with_x(self):
+        valid_isbn_10 = ISBN('0-9752298-0-X')
+        self.assertTrue(valid_isbn_10.is_valid())
+        self.assertEqual(valid_isbn_10.break_down_isbn(), [
+            'Group: 09', 'Publisher: 7522', 'Title: 980', 'Check digit: X'
+        ])
+        self.assertEqual(valid_isbn_10.format(), '0-975-22980-X')
+        self.assertEqual(valid_isbn_10.to_isbn_13(), '978-0-97-522980-4')
+        self.assertEqual(valid_isbn_10.to_ean_13(), '9780975229804')
 
     def test_invalid_isbn(self):
         with self.assertRaises(ValueError):
@@ -51,7 +70,6 @@ class IsbnTestCase(unittest.TestCase):
         self.assertEqual(isbn.format(), '2-951-27742-3')
         self.assertEqual(isbn.to_isbn_13(), '978-2-95-127742-7')
         self.assertEqual(isbn.to_ean_13(), '9782951277427')
-        a = 0
 
 
 if __name__ == '__main__':
