@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Union
 
 
 class SQL:
@@ -90,7 +90,7 @@ class SQL:
         self.where_statement = where_statement
         self._sql = None
 
-    def set_limit(self, limit: int | None):
+    def set_limit(self, limit: Union[int, None]):
         """
         Sets the LIMIT statement for the query.
 
