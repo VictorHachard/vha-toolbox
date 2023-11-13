@@ -134,12 +134,12 @@ class ISBN:
             >>> ISBN('316148410X').format()
             '3-16-148410-X'
             >>> ISBN('9781861978769').format()
-            '978-1-86197-876-9'
+            '978-1-86-197876-9'
         """
         if len(self.isbn) == 10:
             return f"{self.isbn[:1]}-{self.isbn[1:4]}-{self.isbn[4:9]}-{self.isbn[9]}"
         elif len(self.isbn) == 13:
-            return f"{self.isbn[:3]}-{self.isbn[3:4]}-{self.isbn[4:9]}-{self.isbn[9:12]}-{self.isbn[12]}"
+            return f"{self.isbn[:3]}-{self.isbn[3:4]}-{self.isbn[4:6]}-{self.isbn[6:12]}-{self.isbn[12]}"
 
     def to_ean(self, prefix: str = "978") -> str:
         """

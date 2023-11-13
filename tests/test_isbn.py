@@ -10,7 +10,7 @@ class IsbnTestCase(unittest.TestCase):
         self.assertEqual(valid_isbn_13.break_down_isbn(), [
             'Prefix: 978', 'Registration group: 1', 'Registrant: 86197', 'Publication: 876', 'Check digit: 9'
         ])
-        self.assertEqual(valid_isbn_13.format(), '978-1-86197-876-9')
+        self.assertEqual(valid_isbn_13.format(), '978-1-86-197876-9')
         self.assertEqual(valid_isbn_13.to_ean(), '9781861978769')
 
     def test_valid_isbn_10(self):
@@ -34,8 +34,8 @@ class IsbnTestCase(unittest.TestCase):
 
     def test_string_representation(self):
         isbn_13 = ISBN('978-1-86197-876-9')
-        self.assertEqual(str(isbn_13), '978-1-86197-876-9')
-        self.assertEqual(repr(isbn_13), "ISBN(978-1-86197-876-9)")
+        self.assertEqual(str(isbn_13), '978-1-86-197876-9')
+        self.assertEqual(repr(isbn_13), "ISBN(978-1-86-197876-9)")
 
 
 if __name__ == '__main__':
