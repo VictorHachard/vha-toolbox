@@ -141,9 +141,52 @@ class ISBN:
         elif len(self.isbn) == 13:
             return f"{self.isbn[:3]}-{self.isbn[3:4]}-{self.isbn[4:6]}-{self.isbn[6:12]}-{self.isbn[12]}"
 
-    def to_ean(self, prefix: str = "978") -> str:
+    def _generate_isbn_13_check_digit(self, prefix: str = "978") -> int:
         """
-        Converts an ISBN (either ISBN-13 or ISBN-10) to its corresponding EAN-13.
+        """
+        if prefix not in ("978", "979"):
+            raise ValueError("Invalid prefix")
+
+        check_sum = sum(int(digit) * (1 if index % 2 == 0 else 3) for index, digit in enumerate(prefix + self.isbn[:-1]))
+        return (10 - (check_sum % 10)) % 10
+
+    def _isbn_10_to_isbn_13(self, prefix: str = "978"):
+        """
+        """
+        if prefix not in ("978", "979"):
+            raise ValueError("Invalid prefix")
+
+        return ISBN(prefix + self.isbn[:-1] + str(self._generate_isbn_13_check_digit(prefix)))
+
+    def to_isbn_13(self, prefix: str = "978") -> str:
+        """
+        Converts an ISBN-10 to ISBN-13.
+
+        Args:
+            prefix (str, optional): The EAN-13 prefix to use for ISBN-10. Defaults to "978".
+
+        Returns:
+            str: The converted ISBN-13.
+
+        Examples:
+            >>> ISBN('0306406152').to_isbn_13()
+            '9780306406157'
+            >>> ISBN('0306406152').to_isbn_13("979")
+            '9790306406157'
+            >>> ISBN('9783161484105').to_isbn_13()
+            '9783161484105'
+        """
+        if prefix not in ("978", "979"):
+            raise ValueError("Invalid prefix")
+
+        if len(self.isbn) == 10:
+            return self._isbn_10_to_isbn_13(prefix).format()
+        elif len(self.isbn) == 13:
+            return self.format()
+
+    def to_ean_13(self, prefix: str = "978") -> str:
+        """
+        Converts an ISBN to EAN-13.
 
         Args:
             prefix (str, optional): The EAN-13 prefix to use for ISBN-10. Defaults to "978".
@@ -151,21 +194,19 @@ class ISBN:
         Returns:
             str: The converted EAN-13.
 
-        Examples:
-            >>> ISBN('978-3-16-148410-5').to_ean()
-            '9783161484105'
-            >>> ISBN('3-16-148410-X').to_ean()
-            '9783161484105'
-            >>> ISBN('3-16-148410-x').to_ean()
-            '9783161484105'
-            >>> ISBN('0-306-40615-2').to_ean()
+        Examples
+            >>> ISBN('0306406152').to_ean_13()
             '9780306406157'
+            >>> ISBN('0306406152').to_ean_13("979")
+            '9790306406157'
+            >>> ISBN('9783161484105').to_ean_13()
+            '9783161484105'
         """
         if prefix not in ("978", "979"):
             raise ValueError("Invalid prefix")
 
         if len(self.isbn) == 10:
-            return prefix + self.isbn  # Adding the EAN-13 prefix for ISBN-10
+            return self._isbn_10_to_isbn_13(prefix).isbn
         elif len(self.isbn) == 13:
             return self.isbn
 

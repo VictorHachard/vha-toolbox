@@ -100,3 +100,32 @@ def anonymize_sentence(
         result.append(word)
 
     return ''.join(result)
+
+
+def text_to_html(text: str, replacements: [str] = None) -> str:
+    """
+    Converts a text string to HTML.
+
+    Args:
+        text:
+        replacements:
+
+    Returns:
+        str: The converted HTML string.
+
+    Examples:
+        >>> text_to_html('Hello world!')
+        '<p>Hello world!</p>'
+        >>> text_to_html('Hello\nworld!')
+        '<p>Hello</p><p>world!</p>'
+    """
+    if not text:
+        return ''
+    if replacements is None or not replacements:
+        replacements = ['\n']
+
+    for replacement in replacements:
+        text = text.replace(replacement, '</p><p>')
+    text = f'<p>{text}</p>'
+
+    return text
