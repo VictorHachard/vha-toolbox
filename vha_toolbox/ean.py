@@ -1,3 +1,4 @@
+from typing import Union
 
 COUNTRY_CODES = {
     "000-019": "United States and Canada",
@@ -252,7 +253,7 @@ class EAN:
     def __repr__(self):
         return f"EAN({self.format()})"
 
-    def __eq__(self, other):
+    def __eq__(self, other: Union[object, str]) -> bool:
         """
         Compares two EAN-13s.
 

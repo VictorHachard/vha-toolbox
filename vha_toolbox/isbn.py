@@ -172,7 +172,7 @@ class ISBN:
         check_sum = sum(int(digit) * (1 if index % 2 == 0 else 3) for index, digit in enumerate(prefix + self.isbn[:-1]))
         return (10 - (check_sum % 10)) % 10
 
-    def _isbn_10_to_isbn_13(self, prefix: str = "978"):
+    def _isbn_10_to_isbn_13(self, prefix: str = "978") -> object:
         """
         Converts an ISBN-10 to ISBN-13.
 
