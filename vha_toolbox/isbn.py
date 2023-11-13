@@ -215,3 +215,11 @@ class ISBN:
 
     def __repr__(self):
         return f"ISBN({self.format()})"
+
+    def __eq__(self, other):
+        if isinstance(other, ISBN):
+            return self.isbn == other.isbn
+        elif isinstance(other, str):
+            return self.isbn == ISBN(other).isbn
+        else:
+            return False

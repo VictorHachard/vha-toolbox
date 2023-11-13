@@ -20,8 +20,8 @@ class IsbnTestCase(unittest.TestCase):
         self.assertEqual(valid_isbn_13.break_down_isbn(), [
             'Prefix: 978', 'Registration group: 0', 'Registrant: 30640', 'Publication: 615', 'Check digit: 7'
         ])
-        self.assertEqual(valid_isbn_13.format(), '978-0-306-40615-7')
-        self.assertEqual(valid_isbn_13.to_ean(), '9780306406157')
+        self.assertEqual(valid_isbn_13.format(), '978-0-30-640615-7')
+        self.assertEqual(valid_isbn_13.to_ean_13(), '9780306406157')
 
     def test_valid_isbn_10(self):
         valid_isbn_10 = ISBN('0-306-40615-2')
@@ -70,6 +70,16 @@ class IsbnTestCase(unittest.TestCase):
         self.assertEqual(isbn.format(), '2-951-27742-3')
         self.assertEqual(isbn.to_isbn_13(), '978-2-95-127742-7')
         self.assertEqual(isbn.to_ean_13(), '9782951277427')
+
+    def test_equal(self):
+        isbn_1 = ISBN('978-1-86197-876-9')
+        isbn_2 = ISBN('978-1-86197-876-9')
+        self.assertEqual(isbn_1, isbn_2)
+
+    def test_equal_str(self):
+        isbn_1 = ISBN('978-1-86197-876-9')
+        isbn_2 = '978-1-86197-876-9'
+        self.assertEqual(isbn_1, isbn_2)
 
 
 if __name__ == '__main__':

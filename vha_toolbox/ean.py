@@ -77,3 +77,11 @@ class EAN:
 
     def __repr__(self):
         return f"EAN({self.format()})"
+
+    def __eq__(self, other):
+        if isinstance(other, EAN):
+            return self.ean == other.ean
+        elif isinstance(other, str):
+            return self.ean == other
+        else:
+            return False
