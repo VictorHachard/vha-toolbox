@@ -8,7 +8,7 @@ class EanTestCase(unittest.TestCase):
         ean = EAN('5449000021199')
         result = ean.break_down_ean()
         self.assertEqual(result, [
-            'Prefix: 544', 'Manufacturer/Product: 900002119', 'Check digit: 9'
+            'Country: 544', 'Manufacturer/Product: 900002119', 'Check digit: 9'
         ])
         result = ean.format()
         self.assertEqual(result, '5449000021199')
@@ -17,7 +17,7 @@ class EanTestCase(unittest.TestCase):
         ean = EAN('9783161484100')
         result = ean.break_down_ean()
         self.assertEqual(result, [
-            'Prefix: 978', 'Manufacturer/Product: 316148410', 'Check digit: 0'
+            'Country: 978', 'Manufacturer/Product: 316148410', 'Check digit: 0'
         ])
         result = ean.format()
         self.assertEqual(result, '9783161484100')
