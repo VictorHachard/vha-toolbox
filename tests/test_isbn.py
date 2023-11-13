@@ -73,13 +73,13 @@ class IsbnTestCase(unittest.TestCase):
 
     def test_equal(self):
         isbn_1 = ISBN('978-1-86197-876-9')
-        isbn_2 = ISBN('978-1-86197-876-9')
-        self.assertEqual(isbn_1, isbn_2)
+        self.assertTrue(isbn_1 == ISBN('978-1-86197-876-9'))
+        self.assertFalse(isbn_1 == ISBN('2-9512774-2-3'))
 
     def test_equal_str(self):
         isbn_1 = ISBN('978-1-86197-876-9')
-        isbn_2 = '978-1-86197-876-9'
-        self.assertEqual(isbn_1, isbn_2)
+        self.assertTrue(isbn_1 == '978-1-86197-876-9')
+        self.assertFalse(isbn_1 == ISBN('2-9512774-2-3'))
 
 
 if __name__ == '__main__':

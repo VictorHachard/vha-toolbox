@@ -1,3 +1,5 @@
+from typing import Union
+
 
 class ISBN:
     """
@@ -93,6 +95,7 @@ class ISBN:
         Returns:
             bool: True if the ISBN-13 is valid, False otherwise.
         """
+        # (a * 1 + b * 3 + c * 1 + d * 3 + e * 1 + f * 3 + g * 1 + h * 3 + i * 1 + j * 3 + k * 1 + l * 3) % 10
         check_sum = sum(int(digit) * (1 if index % 2 == 0 else 3) for index, digit in enumerate(self.isbn[:-1]))
         calculated_check_digit = (10 - (check_sum % 10)) % 10
         return calculated_check_digit == int(self.isbn[-1])
@@ -104,6 +107,7 @@ class ISBN:
         Returns:
             bool: True if the ISBN-10 is valid, False otherwise.
         """
+        # (a * 1 + b * 2 + c * 3 + d * 4 + e * 5 + f * 6 + g * 7 + h * 8 + i * 9 + j * 10 + k * 11) % 11
         check_sum = sum((i + 1) * int(digit) if digit != 'X' else 10 for i, digit in enumerate(self.isbn[:-1]))
         return check_sum % 11 == int(self.isbn[-1]) if self.isbn[-1] != 'X' else check_sum % 11 == 10
 
@@ -143,6 +147,24 @@ class ISBN:
 
     def _generate_isbn_13_check_digit(self, prefix: str = "978") -> int:
         """
+        Generates the check digit for an ISBN-13.
+
+        Args:
+            prefix (str, optional): The EAN-13 prefix to use for ISBN-10. Defaults to "978".
+
+        Returns:
+            int: The check digit.
+
+        Examples:
+            >>> ISBN('0306406152')._generate_isbn_13_check_digit()
+            7
+            >>> ISBN('0306406152')._generate_isbn_13_check_digit("979")
+            7
+            >>> ISBN('9783161484105')._generate_isbn_13_check_digit()
+            5
+
+        Raises:
+            ValueError: If the prefix is invalid.
         """
         if prefix not in ("978", "979"):
             raise ValueError("Invalid prefix")
@@ -152,6 +174,24 @@ class ISBN:
 
     def _isbn_10_to_isbn_13(self, prefix: str = "978"):
         """
+        Converts an ISBN-10 to ISBN-13.
+
+        Args:
+            prefix (str, optional): The EAN-13 prefix to use for ISBN-10. Defaults to "978".
+
+        Returns:
+            ISBN: The converted ISBN-13.
+
+        Examples:
+            >>> ISBN('0306406152')._isbn_10_to_isbn_13()
+            ISBN(978-0-30-640615-7)
+            >>> ISBN('0306406152')._isbn_10_to_isbn_13("979")
+            ISBN(979-0-30-640615-7)
+            >>> ISBN('9783161484105')._isbn_10_to_isbn_13()
+            ISBN(978-3-16-148410-5)
+
+        Raises:
+            ValueError: If the prefix is invalid.
         """
         if prefix not in ("978", "979"):
             raise ValueError("Invalid prefix")
@@ -216,7 +256,22 @@ class ISBN:
     def __repr__(self):
         return f"ISBN({self.format()})"
 
-    def __eq__(self, other):
+    def __eq__(self, other: Union[object, str]) -> bool:
+        """
+        Compares two ISBNs.
+
+        Args:
+            other (ISBN or str): The other ISBN to compare to.
+
+        Returns:
+            bool: True if the ISBNs are equal, False otherwise.
+
+        Examples:
+            >>> ISBN('978-1-86197-876-9') == ISBN('978-1-86197-876-9')
+            True
+            >>> ISBN('978-1-86197-876-9') == '978-1-86197-876-9'
+            True
+        """
         if isinstance(other, ISBN):
             return self.isbn == other.isbn
         elif isinstance(other, str):

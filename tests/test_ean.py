@@ -36,6 +36,12 @@ class EanTestCase(unittest.TestCase):
         self.assertFalse(ean == '9783161484100')
         self.assertTrue(ean == '5449000021199')
 
+    def test_country_name(self):
+        isbn = EAN('9781861978769')
+        self.assertEqual(isbn.get_country_name(), 'Bookland (ISBN)')
+        isbn = EAN('5449000054227')
+        self.assertEqual(isbn.get_country_name(), 'Belgium and Luxembourg')
+
 
 if __name__ == '__main__':
     unittest.main()
