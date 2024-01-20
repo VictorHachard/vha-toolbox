@@ -106,3 +106,50 @@ def get_last_day_of_month(dt: date = date.today()) -> date:
         datetime.date(2023, 6, 30)
     """
     return date(dt.year, dt.month, monthrange(dt.year, dt.month)[1])
+
+
+def is_renewal_due(dt_to_check: date, dt: date = date.today()) -> bool:
+    """
+    Check if the renewal date is due for the given date or the current date if not provided.
+    This function accounts for different month lengths and leap years.
+
+    Args:
+        dt_to_check (date): The date to check.
+        dt (date): The date to check against (default: current date).
+
+    Returns:
+        bool: True if the renewal date is due, False otherwise.
+
+    Example:
+        >>> is_renewal_due(date(2023, 6, 15), date(2023, 6, 15))
+        False
+        >>> is_renewal_due(date(2023, 6, 15), date(2023, 7, 15))
+        True
+        >>> is_renewal_due(date(2023, 6, 15), date(2023, 7, 16))
+        False
+        >>> is_renewal_due(date(2023, 6, 15), date(2024, 7, 15))
+        True
+        >>> is_renewal_due(date(2020, 2, 29), date(2021, 2, 28))
+        True
+        >>> is_renewal_due(date(2020, 5, 31), date(2021, 5, 30))
+        True
+    """
+    # Check if today is passed or the same as the renewal date
+    if dt_to_check >= dt:
+        return False
+
+    is_leap_year = dt.year % 4 == 0 and (dt.year % 100 != 0 or dt.year % 400 == 0)
+
+    # Handle February for leap and non-leap years
+    if dt_to_check.month == 2:
+        if is_leap_year and dt.day == 29:
+            return dt_to_check.day == 29
+        elif not is_leap_year and dt.day == 28:
+            return dt_to_check.day in [28, 29]
+
+    # Handle renewal due for months with 30 days
+    if dt_to_check.month in [4, 6, 9, 11] and dt_to_check.day == 31:
+        return dt.day == 30
+
+    # Default check for other cases
+    return dt_to_check.day == dt.day
