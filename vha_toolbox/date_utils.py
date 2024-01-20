@@ -108,6 +108,51 @@ def get_last_day_of_month(dt: date = date.today()) -> date:
     return date(dt.year, dt.month, monthrange(dt.year, dt.month)[1])
 
 
+def next_renewal_date(dt: date = date.today(), index: int = 1) -> date:
+    """
+    Get the next renewal date for the given date or the current date if not provided.
+
+    Args:
+        index (int): The number of months to add to the date (default: 1).
+        dt (date): The date for which to retrieve the next renewal date (default: current date).
+
+    Returns:
+        date: The next renewal date as a date object.
+
+    Example:
+        >>> next_renewal_date(date(2023, 6, 15))
+        datetime.date(2023, 7, 15)
+        >>> next_renewal_date(date(2023, 6, 15), 2)
+        datetime.date(2023, 8, 15)
+        >>> next_renewal_date(date(2023, 10, 31), 4)
+        datetime.date(2024, 2, 29)
+    """
+    year, month = dt.year, dt.month
+
+    # Increment month and adjust year if necessary
+    month += index
+    while month > 12:
+        month -= 12
+        year += 1
+
+    # Check if it's a leap year
+    is_leap_year = year % 4 == 0 and (year % 100 != 0 or year % 400 == 0)
+
+    # Adjust day for February in leap and non-leap years
+    if month == 2:
+        if is_leap_year and dt.day > 29:
+            return date(year, 2, 29)
+        elif not is_leap_year and dt.day > 28:
+            return date(year, 2, 28)
+
+    # Handle last day of month for 30 day months
+    if month in [4, 6, 9, 11] and dt.day > 30:
+        return date(year, month, 30)
+
+    # Standard case
+    return date(year, month, dt.day)
+
+
 def is_renewal_due(dt_to_check: date, dt: date = date.today()) -> bool:
     """
     Check if the renewal date is due for the given date or the current date if not provided.
