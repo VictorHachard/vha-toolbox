@@ -26,6 +26,9 @@ def truncate_with_ellipsis(
         'Hello...'
         >>> truncate_with_ellipsis('Hello world! ', 6)
         'Hello...' # trailing whitespace is deleted by default (instead of 'Hello ...')
+
+    Warning:
+        This function is deprecated and will be removed in future versions. Use textwrap.shorten() instead.
     """
     if len(input_string) <= max_length:
         return input_string
