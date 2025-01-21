@@ -29,6 +29,6 @@ setuptools.setup(
     ],
     packages=['vha_toolbox'],
     install_requires=[
-        'Unidecode==1.3.6'
+        'Unidecode==1.3.8'
     ],
 )
