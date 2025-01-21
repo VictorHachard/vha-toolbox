@@ -105,7 +105,10 @@ def anonymize_sentence(
     return ''.join(result)
 
 
-def text_to_html(text: str, replacements: [str] = None) -> str:
+def text_to_html(
+        text: str,
+        replacements: [str] = None
+) -> str:
     """
     Converts a text string to HTML.
 
@@ -132,3 +135,62 @@ def text_to_html(text: str, replacements: [str] = None) -> str:
     text = f'<p>{text}</p>'
 
     return text
+
+
+def seconds_to_humantime(
+        seconds: int,
+        include_seconds: bool = True
+) -> str:
+    """
+    Converts a number of seconds to a human-readable time format with years, months, days, hours, minutes, and seconds.
+
+    Args:
+        seconds (int): The number of seconds to convert.
+        include_seconds (bool, optional): Whether to include seconds in the output. If the number is under 60 seconds,
+        this parameter is ignored. Defaults to True.
+
+    Returns:
+        str: The human-readable time format.
+
+    Examples:
+        >>> seconds_to_humantime(3660)
+        '1 hour 1 minute'
+        >>> seconds_to_humantime(3660, include_seconds=False)
+        '1 hour 1 minute'
+        >>> seconds_to_humantime(60)
+        '1 minute'
+        >>> seconds_to_humantime(120)
+        '2 minutes'
+        >>> seconds_to_humantime(0)
+        '0 seconds'
+        >>> seconds_to_humantime(31536000 + 2592000 + 86400 + 3600 + 60 + 1)
+        '1 year, 1 month, 1 day, 1 hour, 1 minute and 1 second'
+    """
+    if seconds < 0:
+        raise ValueError("Input should be a non-negative integer.")
+
+    intervals = (
+        (31536000, "year"),  # 365 days
+        (2592000, "month"),  # 30 days
+        (86400, "day"),
+        (3600, "hour"),
+        (60, "minute"),
+        (1, "second"),
+    )
+
+    parts = []
+    for interval_seconds, unit in intervals:
+        value, seconds = divmod(seconds, interval_seconds)
+        if value:
+            parts.append(f"{value} {unit}{'s' if value > 1 else ''}")
+
+    if not include_seconds and parts and (parts[-1].endswith("seconds") or parts[-1].endswith("second")):
+        parts.pop()
+
+    if not parts:
+        return "0 seconds"
+
+    if len(parts) > 1:
+        return ", ".join(parts[:-1]) + " and " + parts[-1]
+    else:
+        return parts[0]
