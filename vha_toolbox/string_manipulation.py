@@ -169,6 +169,8 @@ def seconds_to_humantime(
     if seconds < 0:
         raise ValueError("Input should be a non-negative integer.")
 
+    seconds = int(seconds)
+
     intervals = (
         (31536000, "year"),  # 365 days
         (2592000, "month"),  # 30 days

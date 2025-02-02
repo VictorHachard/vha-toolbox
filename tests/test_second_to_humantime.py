@@ -25,6 +25,9 @@ class TestSecondsToHumanTime(unittest.TestCase):
     def test_seconds_to_humantime_7(self):
         self.assertEqual(seconds_to_humantime(61, include_seconds=False), '1 minute')
 
+    def test_seconds_to_humantime_8(self):
+        self.assertEqual(seconds_to_humantime(6646.15384615), '1 hour, 50 minutes and 46 seconds')
+
 
 if __name__ == '__main__':
     unittest.main()
