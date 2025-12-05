@@ -22,9 +22,11 @@ jobs:
     - name: Install setuptools (for 3.12+)
       if: matrix.python-version >= '3.12'
       run: pip install setuptools
+    - name: Install dependencies
+      run: |
+        pip install .          # installe vha-toolbox
+        pip install pytest Pillow
     - name: Install package
       run: python setup.py install
-    - name: Install pytest
-      run: pip install pytest
     - name: Run tests
       run: pytest tests/test*
