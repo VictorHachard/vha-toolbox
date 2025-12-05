@@ -1,9 +1,13 @@
 import hashlib
 import json
 from pathlib import Path
+from typing import Any, Iterable, Optional, Union
 
 
-def compute_file_hash(file_path: str | Path, extra_paths: list[str | Path] | None = None) -> str:
+def compute_file_hash(
+    file_path: Union[str, Path],
+    extra_paths: Optional[Iterable[Union[str, Path]]] = None
+) -> str:
     """
     Compute a stable SHA-256 hash for a file, optionally combined with other files.
     Only the first 8 hexadecimal characters of the hash are returned.
@@ -59,7 +63,11 @@ def compute_file_hash(file_path: str | Path, extra_paths: list[str | Path] | Non
     return hasher.hexdigest()[:8]
 
 
-def compute_stable_hash(values, prefix: str | None = None, length: int = 8) -> str:
+def compute_stable_hash(
+    values: Any,
+    prefix: Optional[str] = None,
+    length: int = 8
+) -> str:
     """
     Compute a stable SHA-256 hash from any list of Python values.
 

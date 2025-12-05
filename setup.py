@@ -6,7 +6,7 @@ long_description = (pathlib.Path(__file__).parent.resolve() / 'README.md').read_
 
 setuptools.setup(
     name='vha-toolbox',
-    version='0.0.11',
+    version='0.0.13',
     author='Victor Hachard',
     author_email='31635811+VictorHachard@users.noreply.github.com',
     url='https://github.com/VictorHachard/vha-toolbox',
@@ -31,6 +31,7 @@ setuptools.setup(
     ],
     packages=['vha_toolbox'],
     install_requires=[
-        'Unidecode==1.4.0'
+        'Unidecode==1.4.0',
+        'Pillow>=10.0.0',
     ],
 )
