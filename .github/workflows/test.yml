@@ -19,11 +19,9 @@ jobs:
         python-version: ${{ matrix.python-version }}
     - name: Update pip
       run: python -m pip install --upgrade pip
-    - name: Install setuptools (for 3.12)
-      run: |
-        if [ "${{ matrix.python-version }}" >= "3.12" ]; then
-          pip install setuptools
-        fi
+    - name: Install setuptools (for 3.12+)
+      if: matrix.python-version >= '3.12'
+      run: pip install setuptools
     - name: Install package
       run: python setup.py install
     - name: Install pytest
