@@ -2,7 +2,9 @@ from .data_manipulation import *
 from .date_utils import *
 from .ean import *
 from .excel_column_conversion import *
+from .file_hash_utils import *
 from .format_size import *
+from .frame_ratio_utils import *
 from .highlight_text import *
 from .isbn import *
 from .magnet_link import *
