@@ -6,6 +6,7 @@ from .file_hash_utils import *
 from .format_size import *
 from .frame_ratio_utils import *
 from .highlight_text import *
+from .image_crop_utils import *
 from .isbn import *
 from .magnet_link import *
 from .sql_helper import *
