@@ -27,9 +27,11 @@ def highlight_text(
     Returns:
         str: The text with the specified words highlighted using the provided tags.
 
-    Example:
+    Examples:
         >>> highlight_text('Hello world! This is a sample text.', ['hello', 'sample'])
         '<span>Hello</span> world! This is a <span>sample</span> text.'
+        >>> highlight_text('Café au lait', ['cafe'], accents_insensitive=True)
+        '<span>Café</span> au lait'
     """
     positions = []
 

@@ -4,14 +4,11 @@ if TYPE_CHECKING:
     from PIL import Image
 
 
-CropPosition = Literal[
-    "center", "left", "right", "top", "bottom"
-]
-
-
 def crop_to_square(
     image: "Image.Image",
-    position: CropPosition = "center",
+    position: Literal[
+        "center", "left", "right", "top", "bottom"
+    ] = "center",
     offset: int = 0
 ) -> "Image.Image":
     """
@@ -20,11 +17,21 @@ def crop_to_square(
 
     Args:
         image (Image.Image): Input image.
-        position (CropPosition): Crop alignment.
+        position: Crop alignment.
         offset (int): Shift from the chosen side.
 
     Returns:
         Image.Image: Square-cropped image.
+
+    Example:
+        >>> from PIL import Image
+        >>> img = Image.new('RGB', (200, 100), color='red')
+        >>> cropped = crop_to_square(img, position='left')
+        >>> cropped.size
+        (100, 100)
+        >>> cropped = crop_to_square(img, position='right', offset=10)
+        >>> cropped.size
+        (100, 100)
 
     Raises:
         ValueError: If image is None or position is invalid.

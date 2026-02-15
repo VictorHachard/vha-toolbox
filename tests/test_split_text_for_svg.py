@@ -60,6 +60,81 @@ class GenerateTextSvgTestCase(unittest.TestCase):
         expected_svg = """<?xml version='1.0' encoding='UTF-8'?><svg width='180' height='180' viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'><rect width='180' height='180' fill='hsl(157, 68%, 45%)'/><text fill='#111111' font-size='34' font-weight='700' text-anchor='middle' dominant-baseline='middle' font-family='sans-serif' x='90' y='90' textLength='160' lengthAdjust='spacingAndGlyphs'>No shadow</text></svg>"""
         self.assertEqual(svg, expected_svg)
 
+    def test_generate_text_svg_raises_on_empty_text(self):
+        with self.assertRaises(ValueError):
+            generate_text_svg("", 180, seed="x")
+
+    def test_generate_text_svg_raises_on_whitespace_text(self):
+        with self.assertRaises(ValueError):
+            generate_text_svg("   \n\t", 180, seed="x")
+
+    def test_generate_text_svg_raises_on_invalid_bg_color(self):
+        with self.assertRaises(ValueError):
+            generate_text_svg("Hello", 180, bg_color="rgb(1,2,3)")
+
+    def test_generate_text_svg_raises_on_invalid_hex_bg_color(self):
+        with self.assertRaises(ValueError):
+            generate_text_svg("Hello", 180, bg_color="#123")
+
+    def test_generate_text_svg_raises_on_invalid_hsl_bg_color(self):
+        with self.assertRaises(ValueError):
+            generate_text_svg("Hello", 180, bg_color="hsl(10, 120%, 40%)")
+
+    def test_generate_text_svg_raises_on_invalid_text_color(self):
+        with self.assertRaises(ValueError):
+            generate_text_svg("Hello", 180, bg_color="#112233", text_color="yellow")
+
+    def test_generate_text_svg_raises_on_padding_too_large(self):
+        with self.assertRaises(ValueError):
+            generate_text_svg("Hello", 180, seed="x", padding=90)
+
+    def test_generate_text_svg_raises_on_negative_size(self):
+        with self.assertRaises(ValueError):
+            generate_text_svg("Hello", -1, seed="x")
+
+    def test_generate_text_svg_raises_on_invalid_font_weight(self):
+        with self.assertRaises(ValueError):
+            generate_text_svg("Hello", 180, seed="x", font_weight=0)
+
+    def test_generate_text_svg_raises_on_invalid_font_family_empty(self):
+        with self.assertRaises(ValueError):
+            generate_text_svg("Hello", 180, seed="x", font_family="")
+
+    def test_generate_text_svg_raises_on_invalid_font_family_spaces_unquoted(self):
+        with self.assertRaises(ValueError):
+            generate_text_svg("Hello", 180, seed="x", font_family="Open Sans")
+
+    def test_generate_text_svg_accepts_quoted_font_family(self):
+        svg = generate_text_svg("Hello", 180, seed="x", font_family='"Open Sans", sans-serif')
+        self.assertIn("font-family='&quot;Open Sans&quot;, sans-serif'", svg)
+
+    def test_generate_text_svg_accepts_generic_font(self):
+        svg = generate_text_svg("Hello", 180, seed="x", font_family="serif")
+        self.assertIn("font-family='serif'", svg)
+
+    def test_generate_text_svg_hard_split_long_word(self):
+        svg = generate_text_svg(
+            "SUPERCALIFRAGILISTICEXPIALIDOCIOUS",
+            180,
+            seed="longword",
+            max_lines=4,
+            max_chars_per_line=8,
+        )
+        # we just assert there are multiple <text> lines
+        self.assertGreaterEqual(svg.count("<text "), 2)
+
+    def test_generate_text_svg_force_textLength_logic_short_line(self):
+        # short line should typically avoid textLength (depending on implementation threshold)
+        svg = generate_text_svg("Hi", 180, seed="short", max_chars_per_line=16)
+        # For very short lines, "textLength=" may be absent
+        # (This is a behavior test, not a strict snapshot)
+        self.assertIn(">Hi</text>", svg)
+
+    def test_generate_text_svg_seed_deterministic(self):
+        svg1 = generate_text_svg("Same", 180, seed="same-seed")
+        svg2 = generate_text_svg("Same", 180, seed="same-seed")
+        self.assertEqual(svg1, svg2)
+
 
 if __name__ == "__main__":
     unittest.main()

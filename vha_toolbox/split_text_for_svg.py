@@ -6,12 +6,122 @@ from typing import List, Optional, Tuple
 
 
 # ----------------------------
+# Validators
+# ----------------------------
+_HEX_COLOR_RE = re.compile(r"^\s*#([0-9a-fA-F]{6})\s*$")
+_HSL_RE = re.compile(
+    r"^\s*hsl\(\s*([0-9.]+)\s*,\s*([0-9.]+)%\s*,\s*([0-9.]+)%\s*\)\s*$"
+)
+_CSS_IDENT_RE = re.compile(r"^[A-Za-z_][A-Za-z0-9_-]*$")
+
+
+def _is_finite_number(x) -> bool:
+    try:
+        return x == x and x not in (float("inf"), float("-inf"))
+    except Exception:
+        return False
+
+
+def _validate_positive_int(name: str, value: int, min_value: int = 1) -> int:
+    if not isinstance(value, int):
+        raise ValueError(f"{name} must be an int, got {type(value).__name__}")
+    if value < min_value:
+        raise ValueError(f"{name} must be >= {min_value}, got {value}")
+    return value
+
+
+def _validate_positive_number(name: str, value: float, min_value: float = 0.0) -> float:
+    if not isinstance(value, (int, float)):
+        raise ValueError(f"{name} must be a number, got {type(value).__name__}")
+    if not _is_finite_number(float(value)):
+        raise ValueError(f"{name} must be finite, got {value}")
+    if float(value) < min_value:
+        raise ValueError(f"{name} must be >= {min_value}, got {value}")
+    return float(value)
+
+
+def _validate_color(name: str, color: str) -> str:
+    if not isinstance(color, str) or not color.strip():
+        raise ValueError(f"{name} must be a non-empty string")
+    c = color.strip()
+
+    if _HEX_COLOR_RE.match(c):
+        return c.lower()
+
+    m = _HSL_RE.match(c.lower())
+    if m:
+        h = float(m.group(1))
+        s = float(m.group(2))
+        l = float(m.group(3))
+
+        if not (_is_finite_number(h) and _is_finite_number(s) and _is_finite_number(l)):
+            raise ValueError(f"{name} contains non-finite numbers: {color}")
+
+        if s < 0 or s > 100:
+            raise ValueError(f"{name} saturation must be in [0,100], got {s}")
+        if l < 0 or l > 100:
+            raise ValueError(f"{name} lightness must be in [0,100], got {l}")
+        # Hue can wrap (CSS allows any number), so we accept any finite hue.
+        return f"hsl({h:.0f}, {s:.0f}%, {l:.0f}%)"
+
+    raise ValueError(f"{name} must be '#rrggbb' or 'hsl(h, s%, l%)', got: {color}")
+
+
+# Minimal “font-family exists” checker.
+# In CSS/SVG, you cannot reliably check system fonts at runtime without a renderer.
+# So we enforce: either a generic family or a syntactically valid list.
+_GENERIC_FONTS = {"serif", "sans-serif", "monospace", "cursive", "fantasy", "system-ui"}
+
+
+def _validate_font_family(font_family: str) -> str:
+    if not isinstance(font_family, str) or not font_family.strip():
+        raise ValueError("font_family must be a non-empty string")
+
+    ff = font_family.strip()
+
+    # Allow comma-separated list: e.g. "Inter, sans-serif"
+    parts = [p.strip() for p in ff.split(",") if p.strip()]
+    if not parts:
+        raise ValueError("font_family must contain at least one font name")
+
+    for p in parts:
+        pl = p.lower()
+        if pl in _GENERIC_FONTS:
+            continue
+
+        # Allow quoted font names: "Open Sans"
+        if (p.startswith('"') and p.endswith('"')) or (p.startswith("'") and p.endswith("'")):
+            inner = p[1:-1].strip()
+            if not inner:
+                raise ValueError(f"Invalid quoted font name in font_family: {p}")
+            continue
+
+        # Unquoted font: must be a CSS identifier (no spaces).
+        if not _CSS_IDENT_RE.match(p):
+            raise ValueError(
+                f"Invalid font name '{p}'. Use quotes for spaces, e.g. \"Open Sans\"."
+            )
+
+    return ff
+
+
+def _validate_font_weight(font_weight: int) -> int:
+    if not isinstance(font_weight, int):
+        raise ValueError(f"font_weight must be int, got {type(font_weight).__name__}")
+    if font_weight < 1 or font_weight > 1000:
+        raise ValueError(f"font_weight must be in [1,1000], got {font_weight}")
+    return font_weight
+
+
+# ----------------------------
 # Colors
 # ----------------------------
 def get_hsl_from_seed(seed: str) -> str:
     """
     Generate a deterministic HSL color from a seed (Odoo-like idea).
     """
+    if not isinstance(seed, str) or not seed:
+        raise ValueError("seed must be a non-empty string")
     hashed = sha512(seed.encode("utf-8")).hexdigest()
     hue = int(hashed[0:2], 16) * 360 / 255
     sat = int(hashed[2:4], 16) * ((70 - 40) / 255) + 40
@@ -20,16 +130,13 @@ def get_hsl_from_seed(seed: str) -> str:
 
 
 def _parse_hsl(hsl: str) -> Tuple[float, float, float]:
-    m = re.match(r"^\s*hsl\(\s*([0-9.]+)\s*,\s*([0-9.]+)%\s*,\s*([0-9.]+)%\s*\)\s*$", hsl)
+    m = _HSL_RE.match(hsl)
     if not m:
         raise ValueError(f"Invalid HSL: {hsl}")
     return float(m.group(1)), float(m.group(2)), float(m.group(3))
 
 
 def _hsl_to_rgb(h: float, s: float, l: float) -> Tuple[int, int, int]:
-    """
-    h: 0..360, s/l: 0..100
-    """
     h = (h % 360) / 360.0
     s = max(0.0, min(1.0, s / 100.0))
     l = max(0.0, min(1.0, l / 100.0))
@@ -81,18 +188,14 @@ def _contrast_ratio(rgb1: Tuple[int, int, int], rgb2: Tuple[int, int, int]) -> f
 
 
 def pick_text_color_for_bg(bg_color: str, prefer_white: bool = True) -> str:
-    """
-    Picks '#ffffff' or '#111111' based on contrast with bg_color.
-    Supports: 'hsl(...)' or '#rrggbb'.
-    """
+    bg_color = _validate_color("bg_color", bg_color)
+
     bg_rgb: Tuple[int, int, int]
-    if bg_color.strip().lower().startswith("hsl("):
-        h, s, l = _parse_hsl(bg_color)
+    if bg_color.lower().startswith("hsl("):
+        h, s, l = _parse_hsl(bg_color.lower())
         bg_rgb = _hsl_to_rgb(h, s, l)
     else:
-        m = re.match(r"^\s*#([0-9a-fA-F]{6})\s*$", bg_color)
-        if not m:
-            raise ValueError(f"Unsupported color format: {bg_color}")
+        m = _HEX_COLOR_RE.match(bg_color)
         hx = m.group(1)
         bg_rgb = (int(hx[0:2], 16), int(hx[2:4], 16), int(hx[4:6], 16))
 
@@ -108,22 +211,15 @@ def pick_text_color_for_bg(bg_color: str, prefer_white: bool = True) -> str:
 
 
 # ----------------------------
-# Text splitting (good defaults)
+# Text splitting
 # ----------------------------
 _WORD_RE = re.compile(r"\s+", flags=re.UNICODE)
 
 
-def split_text_for_svg(
-        text: str,
-        max_lines: int,
-        max_chars_per_line: int,
-) -> List[str]:
-    """
-    Robust splitting:
-    - normalize spaces
-    - greedily pack words
-    - if a single word is too long, hard-split it
-    """
+def split_text_for_svg(text: str, max_lines: int, max_chars_per_line: int) -> List[str]:
+    _validate_positive_int("max_lines", int(max_lines), 1)
+    _validate_positive_int("max_chars_per_line", int(max_chars_per_line), 1)
+
     t = (text or "").strip()
     if not t:
         return [""]
@@ -141,16 +237,11 @@ def split_text_for_svg(
             cur = ""
 
     def hard_split_long_word(w: str) -> List[str]:
-        chunks = []
-        for i in range(0, len(w), max_chars_per_line):
-            chunks.append(w[i : i + max_chars_per_line])
-        return chunks
+        return [w[i:i + max_chars_per_line] for i in range(0, len(w), max_chars_per_line)]
 
     for w in words:
         if len(w) > max_chars_per_line:
-            # push current line first
             flush()
-            # split long word into multiple lines
             for chunk in hard_split_long_word(w):
                 lines.append(chunk)
                 if len(lines) >= max_lines:
@@ -179,28 +270,14 @@ class SvgTextOptions:
     padding: int = 10
     max_lines: int = 4
     max_chars_per_line: int = 16
-
     font_family: str = "sans-serif"
     font_weight: int = 700
-
-    # If provided: will not be changed
     bg_color: Optional[str] = None
-
-    # If provided: will not be changed
     text_color: Optional[str] = None
-
-    # If True: keep font-size fixed and use textLength condensing.
-    # If False: will adapt font-size down if needed.
     fixed_font: bool = True
-
-    # If fixed_font is True, use this font size.
     fixed_font_size: int = 34
-
-    # If fixed_font is False, it will start from this and go down.
     max_font_size: int = 40
     min_font_size: int = 16
-
-    # Extra: show a subtle overlay for readability on some backgrounds
     use_shadow: bool = True
 
 
@@ -232,42 +309,99 @@ def generate_text_svg(
         bg_color: optional background color (hsl(...) or #rrggbb)
         text_color: optional text color (#rrggbb). If not provided, chosen by contrast.
         padding: inner padding
-        max_lines / max_chars_per_line: splitting rules
+        max_lines: splitting rule (maximum number of lines)
+        max_chars_per_line: splitting rule (maximum characters per line)
         fixed_font: if True, keep font-size fixed and use textLength to fit width
         fixed_font_size: used when fixed_font=True
-        max_font_size/min_font_size: used when fixed_font=False
-        font_family/font_weight: styling
+        max_font_size: used when fixed_font=False (starting font size)
+        min_font_size: used when fixed_font=False (minimum font size)
+        font_family: font family (CSS/SVG font-family)
+        font_weight: font weight
         use_shadow: adds a subtle shadow for readability
 
     Returns:
         SVG string (utf-8, xml header included).
+
+    Examples:
+        >>> svg = generate_text_svg("Hello World", size=180)
+        >>> print(svg)  # SVG string with "Hello World" centered
+
+        >>> svg = generate_text_svg("This is a longer text that should wrap into multiple lines", size=180, max_lines=3, max_chars_per_line=20)
+        >>> print(svg)  # SVG string with wrapped text
+
+        >>> svg = generate_text_svg("Short", size=180, bg_color="#ff0000", text_color="#00ff00")
+        >>> print(svg)  # SVG string with red background and green text
+
+    Raises:
+        ValueError: if text is empty or if color formats are invalid.
+        ValueError: if the seed is empty or not a string.
+        ValueError: if a parameter expected to be an integer is not an integer.
+        ValueError: if an integer parameter is lower than the allowed minimum value.
+        ValueError: if a parameter expected to be a number is not numeric.
+        ValueError: if a numeric parameter is not finite (NaN or infinite).
+        ValueError: if a color value is empty or not a string.
+        ValueError: if a color format is invalid (not #rrggbb or hsl(h, s%, l%)).
+        ValueError: if HSL saturation is outside the range 0–100.
+        ValueError: if HSL lightness is outside the range 0–100.
+        ValueError: if the font family is empty or not a valid CSS font-family definition.
+        ValueError: if a font name is invalid or contains spaces without quotes.
+        ValueError: if the font weight is not an integer.
+        ValueError: if the font weight is outside the range 1–1000.
+        ValueError: if the input text is empty after trimming.
+        ValueError: if padding is too large compared to the SVG size.
+        ValueError: if the text color is provided but is not a valid hexadecimal color.
+        ValueError: if no background color is provided and the seed is missing or invalid.
     """
-    text = (text or "").strip() or "Text"
+    text = (text or "").strip()
+    if not text:
+        raise ValueError("Text must be non-empty")
+
+    size = _validate_positive_int("size", int(size), 1)
+    padding = _validate_positive_int("padding", int(padding), 0)
+    max_lines = _validate_positive_int("max_lines", int(max_lines), 1)
+    max_chars_per_line = _validate_positive_int("max_chars_per_line", int(max_chars_per_line), 1)
+    font_weight = _validate_font_weight(font_weight)
+    font_family = _validate_font_family(font_family)
+
+    if padding * 2 >= size:
+        raise ValueError(f"padding too large: padding*2 ({padding*2}) must be < size ({size})")
+
+    if bg_color is not None:
+        bg_color = _validate_color("bg_color", bg_color)
+
+    if text_color is not None:
+        text_color = _validate_color("text_color", text_color)
+        # enforce hex-only for text color if you want; comment this out if you want HSL for text too
+        if not _HEX_COLOR_RE.match(text_color):
+            raise ValueError("text_color must be '#rrggbb' (hex)")
 
     if bg_color is None:
         seed_val = seed if seed is not None else text
+        if not isinstance(seed_val, str) or not seed_val:
+            raise ValueError("seed must be a non-empty string when bg_color is not provided")
         bg_color = get_hsl_from_seed(seed_val)
 
     if text_color is None:
         text_color = pick_text_color_for_bg(bg_color)
 
-    pad = int(padding)
-    size = int(size)
-    content_w = size - 2 * pad
-    content_h = size - 2 * pad
+    content_w = size - 2 * padding
+    content_h = size - 2 * padding
 
-    # Split lines
     lines = split_text_for_svg(text, max_lines=max_lines, max_chars_per_line=max_chars_per_line)
     n = len(lines)
 
-    # Determine font size + line height
     if fixed_font:
-        font_size = int(fixed_font_size)
+        fixed_font_size = _validate_positive_int("fixed_font_size", int(fixed_font_size), 1)
+        font_size = fixed_font_size
         line_height = int(round(font_size * 1.18))
     else:
-        # crude heuristic: start high, reduce until height fits (width handled by textLength anyway)
-        font_size = int(max_font_size)
-        while font_size > int(min_font_size):
+        max_font_size = _validate_positive_int("max_font_size", int(max_font_size), 1)
+        min_font_size = _validate_positive_int("min_font_size", int(min_font_size), 1)
+        if min_font_size > max_font_size:
+            raise ValueError("min_font_size must be <= max_font_size")
+
+        font_size = max_font_size
+        while font_size > min_font_size:
             line_height = int(round(font_size * 1.18))
             if n * line_height <= content_h:
                 break
@@ -309,7 +443,7 @@ def generate_text_svg(
         attrs = (
             f"fill='{text_color}' "
             f"font-size='{font_size}' "
-            f"font-weight='{int(font_weight)}' "
+            f"font-weight='{font_weight}' "
             "text-anchor='middle' "
             "dominant-baseline='middle' "
             f"font-family='{html.escape(font_family)}' "

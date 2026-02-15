@@ -6,7 +6,7 @@ from vha_toolbox import should_rotate_by_ratio
 class ShouldRotateByRatioTestCase(unittest.TestCase):
 
     def _img(self, w, h):
-        """Utility pour créer une image PIL en mémoire."""
+        """Helper to create a blank image with given dimensions"""
         return Image.new("RGB", (w, h))
 
     def test_no_rotation_on_square_frame(self):

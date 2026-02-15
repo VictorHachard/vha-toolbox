@@ -1,6 +1,6 @@
 from typing import Union
 
-COUNTRY_CODES = {
+_COUNTRY_CODES = {
     "000-019": "United States and Canada",
     "020-029": "Restricted distribution (MO defined)",
     "030-039": "United States drugs (MO defined)",
@@ -239,12 +239,12 @@ class EAN:
             str: The country name of the EAN-13.
         """
         country_code = self.ean[:3]
-        for key in COUNTRY_CODES:
+        for key in _COUNTRY_CODES:
             codes = key.split("-")
             if len(codes) == 1 and codes[0] == country_code:
-                return COUNTRY_CODES[key]
+                return _COUNTRY_CODES[key]
             elif len(codes) != 1 and int(codes[0]) <= int(country_code) <= int(codes[1]):
-                return COUNTRY_CODES[key]
+                return _COUNTRY_CODES[key]
         return "Unknown"
 
     def __str__(self):

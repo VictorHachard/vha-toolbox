@@ -17,7 +17,7 @@ def generate_table(
     Returns:
         str: The HTML representation of the table.
 
-    Example:
+    Examples:
         >>> generate_table([['a', 'b'], ['c', 'd']])
         '<table><tr><th>a</th><th>b</th></tr><tr><td>c</td><td>d</td></tr></table>'
         >>> generate_table([['a', 'b'], ['c', 'd']], header=['x', 'y'])
