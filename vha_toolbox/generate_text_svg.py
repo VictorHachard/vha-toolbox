@@ -186,6 +186,34 @@ def _contrast_ratio(rgb1: Tuple[int, int, int], rgb2: Tuple[int, int, int]) -> f
     darker = min(l1, l2)
     return (lighter + 0.05) / (darker + 0.05)
 
+def _rgb_from_color(color: str) -> Tuple[int, int, int]:
+    c = _validate_color("color", color)
+    if c.startswith("hsl("):
+        h, s, l = _parse_hsl(c.lower())
+        return _hsl_to_rgb(h, s, l)
+    m = _HEX_COLOR_RE.match(c)
+    hx = m.group(1)
+    return (int(hx[0:2], 16), int(hx[2:4], 16), int(hx[4:6], 16))
+
+
+def _best_bg_for_forced_text(seed_bg_hsl: str, forced_text_hex: str) -> str:
+    h, s, _l = _parse_hsl(_validate_color("seed_bg_hsl", seed_bg_hsl).lower())
+
+    text_rgb = _rgb_from_color(forced_text_hex)
+
+    # Candidate lightness values (you can tweak this set)
+    candidates = [15, 20, 25, 30, 35, 40, 45, 55, 60, 65, 70, 75, 80, 85]
+
+    best = None
+    best_ratio = -1.0
+    for l in candidates:
+        bg_rgb = _hsl_to_rgb(h, s, float(l))
+        ratio = _contrast_ratio(bg_rgb, text_rgb)
+        if ratio > best_ratio:
+            best_ratio = ratio
+            best = l
+
+    return f"hsl({h:.0f}, {s:.0f}%, {best:.0f}%)"
 
 def pick_text_color_for_bg(bg_color: str, prefer_white: bool = True) -> str:
     bg_color = _validate_color("bg_color", bg_color)
@@ -380,6 +408,8 @@ def generate_text_svg(
         if not isinstance(seed_val, str) or not seed_val:
             raise ValueError("seed must be a non-empty string when bg_color is not provided")
         bg_color = get_hsl_from_seed(seed_val)
+        if text_color is not None:
+            bg_color = _best_bg_for_forced_text(bg_color, text_color)
 
     if text_color is None:
         text_color = pick_text_color_for_bg(bg_color)

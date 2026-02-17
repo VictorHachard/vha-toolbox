@@ -1,3 +1,4 @@
+import re
 import unittest
 
 from vha_toolbox import generate_text_svg
@@ -134,6 +135,87 @@ class GenerateTextSvgTestCase(unittest.TestCase):
         svg1 = generate_text_svg("Same", 180, seed="same-seed")
         svg2 = generate_text_svg("Same", 180, seed="same-seed")
         self.assertEqual(svg1, svg2)
+
+    def test_generate_text_svg_forced_text_color_adapts_bg_when_bg_missing(self):
+        # text forced, bg missing -> bg should be auto-picked AND should make the chosen text win
+        svg = generate_text_svg(
+            "Hello World",
+            180,
+            seed="forced-text-1",
+            text_color="#ffffff",
+        )
+        # Must contain forced text color
+        self.assertIn("fill='#ffffff'", svg)
+
+        # Background should be HSL (from seed), not empty
+        self.assertRegex(svg, r"<rect width='180' height='180' fill='hsl\([0-9.]+, [0-9.]+%, [0-9.]+%\)'/>")
+
+        # And since text is forced white, picked bg should NOT lead to automatic black text,
+        # but here text is forced anyway. We assert bg was adapted by checking that the bg is not the raw seed default.
+        # (Raw seed default in your generator is always l=45)
+        self.assertNotIn("% 45%)'/>", svg)  # lightness changed from 45% in adapted mode
+
+
+    def test_generate_text_svg_forced_text_color_does_not_change_bg_if_bg_forced(self):
+        svg = generate_text_svg(
+            "Hello World",
+            180,
+            bg_color="hsl(210, 60%, 45%)",
+            text_color="#ffffff",
+        )
+        # Both respected as-is
+        self.assertIn("fill='hsl(210, 60%, 45%)'", svg)
+        self.assertIn("fill='#ffffff'", svg)
+
+
+    def test_generate_text_svg_forced_text_color_keeps_seed_hue_sat(self):
+        # If you implement "keep hue/sat, adjust only lightness",
+        # then hue/sat must match the seed-derived bg.
+        svg_seed = generate_text_svg(
+            "Hello World",
+            180,
+            seed="forced-text-2",
+        )
+        svg_forced_text = generate_text_svg(
+            "Hello World",
+            180,
+            seed="forced-text-2",
+            text_color="#ffffff",
+        )
+
+        # Extract bg hsl(...) from both
+        m1 = re.search(r"<rect width='180' height='180' fill='(hsl\([^']+\))'/>", svg_seed)
+        m2 = re.search(r"<rect width='180' height='180' fill='(hsl\([^']+\))'/>", svg_forced_text)
+        self.assertIsNotNone(m1)
+        self.assertIsNotNone(m2)
+
+        hsl1 = m1.group(1)
+        hsl2 = m2.group(1)
+
+        # Parse hue and saturation (ignore lightness)
+        m1p = re.match(r"hsl\(\s*([0-9.]+)\s*,\s*([0-9.]+)%\s*,\s*([0-9.]+)%\s*\)", hsl1)
+        m2p = re.match(r"hsl\(\s*([0-9.]+)\s*,\s*([0-9.]+)%\s*,\s*([0-9.]+)%\s*\)", hsl2)
+        self.assertIsNotNone(m1p)
+        self.assertIsNotNone(m2p)
+
+        # Same hue + sat
+        self.assertEqual(m1p.group(1), m2p.group(1))
+        self.assertEqual(m1p.group(2), m2p.group(2))
+
+        # Different lightness (very likely; and expected if adaptation is applied)
+        self.assertNotEqual(m1p.group(3), m2p.group(3))
+
+
+    def test_generate_text_svg_forced_black_text_adapts_bg_when_bg_missing(self):
+        svg = generate_text_svg(
+            "Hello World",
+            180,
+            seed="forced-text-3",
+            text_color="#111111",
+        )
+        self.assertIn("fill='#111111'", svg)
+        self.assertRegex(svg, r"<rect width='180' height='180' fill='hsl\([0-9.]+, [0-9.]+%, [0-9.]+%\)'/>")
+        self.assertNotIn("% 45%)'/>", svg)  # lightness changed from 45% in adapted mode
 
 
 if __name__ == "__main__":

@@ -6,7 +6,7 @@ long_description = (pathlib.Path(__file__).parent.resolve() / 'README.md').read_
 
 setuptools.setup(
     name='vha-toolbox',
-    version='0.0.17',
+    version='0.0.18',
     author='Victor Hachard',
     author_email='31635811+VictorHachard@users.noreply.github.com',
     url='https://github.com/VictorHachard/vha-toolbox',

@@ -9,7 +9,7 @@ from .highlight_text import *
 from .image_crop_utils import *
 from .isbn import *
 from .magnet_link import *
-from .split_text_for_svg import generate_text_svg
+from .generate_text_svg import generate_text_svg
 from .sql_helper import *
 from .string_manipulation import *
 from .table_generator import *
