@@ -29,6 +29,12 @@ class AnonymizeSentenceTestCase(unittest.TestCase):
         anonymized_sentence = anonymize_sentence(sentence, anonymized_char='A')
         self.assertEqual(anonymized_sentence, expected_anonymized_sentence)
 
+    def test_anonymize_sentence_empty_string(self):
+        self.assertEqual(anonymize_sentence(''), '')
+
+    def test_anonymize_sentence_only_special_chars(self):
+        self.assertEqual(anonymize_sentence('!@#$%'), '!@#$%')
+
     # def test_anonymize_sentence_keep_partial_word(self):
     #     sentence = 'Alice is 28 years old.'
     #     expected_anonymized_sentence = 'A***e i* 2* y***s o**.'

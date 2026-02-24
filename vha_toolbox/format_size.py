@@ -63,9 +63,14 @@ def to_bytes(size_str: str) -> int:
         ValueError: If the size format is invalid.
     """
     size_str = size_str.strip().lower()
-    size, unit = size_str.split()
-
-    size = float(size)
+    parts = size_str.split()
+    if len(parts) != 2:
+        raise ValueError(f"Invalid size format: expected '<number> <unit>', e.g. '1.5 MB', got '{size_str}'")
+    size_val, unit = parts
+    try:
+        size = float(size_val)
+    except ValueError:
+        raise ValueError(f"Invalid size format: '{size_val}' is not a valid number")
 
     if size < 0:
         raise ValueError("Size cannot be negative.")

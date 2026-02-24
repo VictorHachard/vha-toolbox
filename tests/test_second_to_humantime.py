@@ -28,6 +28,19 @@ class TestSecondsToHumanTime(unittest.TestCase):
     def test_seconds_to_humantime_8(self):
         self.assertEqual(seconds_to_humantime(6646.15384615), '1 hour, 50 minutes and 46 seconds')
 
+    def test_seconds_to_humantime_negative_raises(self):
+        with self.assertRaises(ValueError):
+            seconds_to_humantime(-1)
+
+    def test_include_seconds_false_ignored_when_under_60s(self):
+        # Doc says: if the total duration is under 60 seconds, include_seconds is ignored
+        self.assertEqual(seconds_to_humantime(30, include_seconds=False), '30 seconds')
+        self.assertEqual(seconds_to_humantime(1, include_seconds=False), '1 second')
+
+    def test_include_seconds_false_removes_seconds_when_over_60s(self):
+        self.assertEqual(seconds_to_humantime(90, include_seconds=False), '1 minute')
+        self.assertEqual(seconds_to_humantime(3661, include_seconds=False), '1 hour and 1 minute')
+
 
 if __name__ == '__main__':
     unittest.main()

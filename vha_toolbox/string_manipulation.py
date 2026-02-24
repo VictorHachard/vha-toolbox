@@ -185,7 +185,7 @@ def seconds_to_humantime(
         if value:
             parts.append(f"{value} {unit}{'s' if value > 1 else ''}")
 
-    if not include_seconds and parts and (parts[-1].endswith("seconds") or parts[-1].endswith("second")):
+    if not include_seconds and len(parts) > 1 and (parts[-1].endswith("seconds") or parts[-1].endswith("second")):
         parts.pop()
 
     if not parts:

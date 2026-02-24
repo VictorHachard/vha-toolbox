@@ -34,6 +34,13 @@ class SortDictTestCase(unittest.TestCase):
         with self.assertRaises(ValueError):
             sort_dict_by_list(input_dict, order_list)
 
+    def test_sort_dict_partial_order_list(self):
+        # order_list is a subset of the dict keys — only those keys are returned
+        input_dict = {'b': 2, 'a': 1, 'c': 3}
+        order_list = ['c', 'a']
+        result = sort_dict_by_list(input_dict, order_list)
+        self.assertEqual(result, {'c': 3, 'a': 1})
+
 
 if __name__ == '__main__':
     unittest.main()

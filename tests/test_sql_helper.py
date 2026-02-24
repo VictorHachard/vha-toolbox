@@ -73,6 +73,24 @@ class SQLHelperTestCase(unittest.TestCase):
         expected_sql = 'WITH with_2 AS (SELECT * FROM other_table)\nSELECT column_1, column_2 FROM my_table JOIN other_table ON my_table.id = other_table.id JOIN other_table ON my_table.id = other_table.id WHERE column_1 > 5 LIMIT 10'
         self.assertEqual(result, expected_sql)
 
+    def test_get_sql_with_order_by(self):
+        sql = sql_helper.SQL('my_table', ['column_1', 'column_2'])
+        sql.set_order_by('column_1 DESC')
+        self.assertEqual(str(sql), 'SELECT column_1, column_2 FROM my_table ORDER BY column_1 DESC')
+
+    def test_get_sql_order_by_before_limit(self):
+        sql = sql_helper.SQL('my_table', ['column_1'])
+        sql.set_where('column_1 > 0')
+        sql.set_order_by('column_1 ASC')
+        sql.set_limit(5)
+        self.assertEqual(str(sql), 'SELECT column_1 FROM my_table WHERE column_1 > 0 ORDER BY column_1 ASC LIMIT 5')
+
+    def test_add_with_duplicate_name_raises(self):
+        sql = sql_helper.SQL('my_table', ['column_1'])
+        sql.add_with('with_1', 'SELECT * FROM other_table')
+        with self.assertRaises(ValueError):
+            sql.add_with('with_1', 'SELECT * FROM another_table')
+
     def test_create_sql_used_in_with(self):
         table_name_1 = 'my_with_table'
         columns_1 = ['column_with_1', 'column_with_2']

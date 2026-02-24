@@ -32,6 +32,12 @@ class TextToHtmlTestCase(unittest.TestCase):
         result = text_to_html(text, replacements)
         self.assertEqual(result, '<p>Hello</p><p></p><p>!</p>')
 
+    def test_text_to_html_empty_string(self):
+        self.assertEqual(text_to_html(''), '')
+
+    def test_text_to_html_none(self):
+        self.assertEqual(text_to_html(None), '')
+
 
 if __name__ == '__main__':
     unittest.main()
